@@ -1,0 +1,159 @@
+<template>
+    <q-page class="constrain q-pa-md">
+        <div class="row q-col-gutter-lg">
+            <div class="col-12 col-sm-8">
+                <template v-if="!loadingPosts && posts.length">
+                    <q-card
+                        v-for="post in posts"
+                        :key="post.id"
+                        class="card-post q-mb-md"
+                        flat
+                        bordered
+                    >
+                        <q-item>
+                            <q-item-section avatar>
+                                <q-avatar>
+                                    <img
+                                        src="https://secure.gravatar.com/avatar/95436a1e6147f1668b10d37547f7e930"
+                                    />
+                                </q-avatar>
+                            </q-item-section>
+
+                            <q-item-section>
+                                <q-item-label class="text-bold"
+                                    >ebdonato</q-item-label
+                                >
+                                <q-item-label caption>
+                                    {{ post.location }}
+                                </q-item-label>
+                            </q-item-section>
+                        </q-item>
+
+                        <q-separator />
+
+                        <q-img :src="post.imageUrl" />
+
+                        <q-separator />
+
+                        <q-card-section>
+                            <div>{{ post.caption }}</div>
+                            <div class="text-caption text-grey">
+                                {{ post.date | niceDate }}
+                            </div>
+                        </q-card-section>
+                    </q-card>
+                </template>
+                <template v-else-if="!loadingPosts && !posts.length">
+                    <h5 class="text-center text-grey">
+                        Nenhuma postagem ainda!
+                    </h5>
+                </template>
+                <template v-else>
+                    <q-card flat bordered>
+                        <q-item>
+                            <q-item-section avatar>
+                                <q-skeleton
+                                    type="QAvatar"
+                                    animation="fade"
+                                    size="40px"
+                                />
+                            </q-item-section>
+
+                            <q-item-section>
+                                <q-item-label>
+                                    <q-skeleton type="text" animation="fade" />
+                                </q-item-label>
+                                <q-item-label caption>
+                                    <q-skeleton type="text" animation="fade" />
+                                </q-item-label>
+                            </q-item-section>
+                        </q-item>
+
+                        <q-skeleton height="200px" square animation="fade" />
+
+                        <q-card-section>
+                            <q-skeleton
+                                type="text"
+                                class="text-subtitle2"
+                                animation="fade"
+                            />
+                            <q-skeleton
+                                type="text"
+                                width="50%"
+                                class="text-subtitle2"
+                                animation="fade"
+                            />
+                        </q-card-section>
+                    </q-card>
+                </template>
+            </div>
+            <div class="col large-screen-only">
+                <q-item class="fixed">
+                    <q-item-section avatar>
+                        <q-avatar size="48px">
+                            <img
+                                src="https://secure.gravatar.com/avatar/95436a1e6147f1668b10d37547f7e930"
+                            />
+                        </q-avatar>
+                    </q-item-section>
+
+                    <q-item-section>
+                        <q-item-label class="text-bold">ebdonato</q-item-label>
+                        <q-item-label caption> Eduardo Donato </q-item-label>
+                    </q-item-section>
+                </q-item>
+            </div>
+        </div>
+    </q-page>
+</template>
+
+<script>
+import { date } from "quasar"
+
+export default {
+    name: "PageHome",
+    data() {
+        return {
+            posts: [],
+            loadingPosts: false,
+        }
+    },
+    methods: {
+        getPosts() {
+            this.loadingPosts = true
+
+            this.$axios
+                .get(`${process.env.API}/posts`)
+                .then((response) => {
+                    this.posts = response.data
+                    this.loadingPosts = false
+                })
+                .catch((err) => {
+                    this.$q.dialog({
+                        title: "Erro",
+                        message: "Não foi possível baixar as postagens.",
+                    })
+                    this.loadingPosts = false
+                })
+        },
+    },
+    created() {
+        this.getPosts()
+    },
+    filters: {
+        niceDate(value) {
+            const postDate = date.formatDate(value, "dddd, DD.MM.YYYY")
+
+            const postHour = date.formatDate(value, "HH:mm")
+
+            return `${postDate} às ${postHour}h`
+        },
+    },
+}
+</script>
+
+<style lang="sass">
+.card-post
+    .q-img
+        min-height: 200px
+</style>
