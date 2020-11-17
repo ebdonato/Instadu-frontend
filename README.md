@@ -1,6 +1,6 @@
 # Instadu! (Instadu!)
 
-A Quasar Framework app
+Instadu!,um clone do Instagram com Quasar Framework. Aprendendo, e muito!!!!
 
 ## Install the dependencies
 ```bash

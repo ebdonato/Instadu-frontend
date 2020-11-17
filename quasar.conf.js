@@ -48,10 +48,8 @@ module.exports = function (/* ctx */) {
     build: {
 
       env: {
-        API: API_PRODUCTION, // API_LOCAL | API_PRODUCTION
+        API: API_LOCAL, // API_LOCAL | API_PRODUCTION
       },
-
-
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 
@@ -80,7 +78,7 @@ module.exports = function (/* ctx */) {
     devServer: {
       https: false,
       port: 8080,
-      open: true // opens browser window automatically
+      open: false // opens browser window automatically
     },
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
@@ -102,12 +100,12 @@ module.exports = function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Dialog', 'Notify', 'Loading']
+      plugins: ['Dialog', 'Notify', 'Loading', 'LocalStorage']
     },
 
     // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
-    animations: [],
+    animations: ['fadeIn', 'fadeOut'],
 
     // https://quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {
@@ -116,16 +114,16 @@ module.exports = function (/* ctx */) {
 
     // https://quasar.dev/quasar-cli/developing-pwa/configuring-pwa
     pwa: {
-      workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
+      workboxPluginMode: 'InjectManifest', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: `Instadu!`,
+        name: `Instadu! - Wow!`,
         short_name: `Instadu!`,
-        description: `A Quasar Framework app`,
+        description: `Um clone do Instagram com Quasar Framework`,
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
-        theme_color: '#027be3',
+        theme_color: '#212121',
         icons: [
           {
             src: 'icons/icon-128x128.png',

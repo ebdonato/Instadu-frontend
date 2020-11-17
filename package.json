@@ -6,15 +6,20 @@
   "author": "ebdonato <63134122+ebdonato@users.noreply.github.com>",
   "private": true,
   "scripts": {
-    "test": "echo \"No test specified\" && exit 0",
-    "dev": "quasar dev"
+    "dev": "quasar dev",
+    "dev-pwa": "quasar dev -m pwa",
+    "build-pwa": "quasar build -m pwa",
+    "deploy": "firebase deploy",
+    "icongenie": "icongenie generate -i icon.png --skip-trim --theme-color FFF500"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
+    "idb": "^5.0.7",
     "md-gum-polyfill": "^1.0.0",
-    "quasar": "^1.0.0"
+    "quasar": "^1.0.0",
+    "web-push": "^3.4.4"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",

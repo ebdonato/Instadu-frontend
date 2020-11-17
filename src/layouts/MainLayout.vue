@@ -27,9 +27,56 @@
             </q-toolbar>
         </q-header>
 
-        <q-footer bordered class="bg-white small-screen-only">
+        <q-footer bordered class="bg-white">
+            <transition
+                appear
+                enter-active-class="animated fadeIn"
+                leave-active-class="animated fadeOut"
+            >
+                <div class="bg-primary" v-if="showAppInstallBanner">
+                    <div class="constrain bg-primary">
+                        <q-banner
+                            inline-actions
+                            dense
+                            class="bg-primary text-white"
+                        >
+                            <template v-slot:avatar>
+                                <q-avatar>
+                                    <img src="icons/favicon-32x32.png" />
+                                </q-avatar>
+                            </template>
+
+                            <b>Instalar <i>Instadu!</i> ?</b>
+
+                            <template v-slot:action>
+                                <q-btn
+                                    dense
+                                    class="q-px-sm"
+                                    flat
+                                    label="Sim"
+                                    @click="installApp"
+                                />
+                                <q-btn
+                                    dense
+                                    class="q-px-sm"
+                                    flat
+                                    label="Depois"
+                                    @click="showAppInstallBanner = false"
+                                />
+                                <q-btn
+                                    dense
+                                    class="q-px-sm"
+                                    flat
+                                    label="Nunca"
+                                    @click="neverShowAppInstallBanner"
+                                />
+                            </template>
+                        </q-banner>
+                    </div>
+                </div>
+            </transition>
             <q-tabs
-                class="text-grey-10"
+                class="small-screen-only text-grey-10"
                 active-color="primary"
                 indicator-color="transparent"
             >
@@ -39,7 +86,9 @@
         </q-footer>
 
         <q-page-container class="bg-grey-1">
-            <router-view />
+            <keep-alive :include="['PageHome']">
+                <router-view />
+            </keep-alive>
         </q-page-container>
     </q-layout>
 </template>
@@ -49,7 +98,49 @@ export default {
     name: "MainLayout",
     components: {},
     data() {
-        return {}
+        return {
+            showAppInstallBanner: false,
+            deferredPrompt: null,
+        }
+    },
+    methods: {
+        installApp() {
+            // Hide the app provided install promotion
+            this.showAppInstallBanner = false
+            // Show the install prompt
+            this.deferredPrompt.prompt()
+            // Wait for the user to respond to the prompt
+            this.deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === "accepted") {
+                    console.log("User accepted the install prompt")
+                } else {
+                    console.log("User dismissed the install prompt")
+                }
+            })
+        },
+        neverShowAppInstallBanner() {
+            this.showAppInstallBanner = false
+            this.$q.localStorage.set("neverShowAppInstallBanner", true)
+        },
+    },
+    mounted() {
+        const neverShowAppInstallBanner = this.$q.localStorage.getItem(
+            "neverShowAppInstallBanner"
+        )
+
+        if (!neverShowAppInstallBanner) {
+            window.addEventListener("beforeinstallprompt", (e) => {
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault()
+                // Stash the event so it can be triggered later.
+                this.deferredPrompt = e
+                // Update UI notify the user they can install the PWA
+
+                setTimeout(() => {
+                    this.showAppInstallBanner = true
+                }, 2000)
+            })
+        }
     },
 }
 </script>

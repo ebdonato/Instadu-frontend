@@ -112,6 +112,10 @@ export default {
             if ("geolocation" in navigator) return true
             return false
         },
+        backgroundSyncSupported() {
+            //suporta ServiceWorker e suporta backgoundSync
+            return "serviceWorker" in navigator && "SyncManager" in window
+        },
     },
     methods: {
         initCamera() {
@@ -249,10 +253,10 @@ export default {
 
                     this.$q.notify({
                         message: "Postagem Criada.",
-
+                        color: "primary",
                         actions: [
                             {
-                                label: "Dismiss",
+                                label: "Ok",
                                 color: "white",
                             },
                         ],
@@ -261,10 +265,15 @@ export default {
                     this.$q.loading.hide()
                 })
                 .catch(() => {
-                    this.$q.dialog({
-                        title: "Erro",
-                        message: "Não foi possível criar a postagem.",
-                    })
+                    if (!navigator.onLine && this.backgroundSyncSupported) {
+                        this.$q.notify("Postagem criada offline")
+                        this.$router.push("/")
+                    } else {
+                        this.$q.dialog({
+                            title: "Erro",
+                            message: "Não foi possível criar a postagem.",
+                        })
+                    }
 
                     this.$q.loading.hide()
                 })
