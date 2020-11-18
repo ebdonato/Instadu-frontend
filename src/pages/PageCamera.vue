@@ -236,47 +236,64 @@ export default {
         addPost() {
             this.$q.loading.show()
 
-            let formData = new FormData()
+            const postCreated = this.$q.localStorage.getItem("postCreated")
 
-            formData.append("id", this.post.id)
-            formData.append("caption", this.post.caption)
-            formData.append("location", this.post.location)
-            formData.append("date", this.post.date)
-            formData.append("photo", this.post.photo, this.post.id + ".png")
+            if (
+                this.$q.platform.is.android &&
+                !postCreated &&
+                !navigator.onLine
+            ) {
+                this.addPostError()
+            } else {
+                let formData = new FormData()
 
-            this.$axios
-                .post(`${process.env.API}/createPost`, formData)
-                .then((response) => {
-                    console.log("response: ", response)
+                formData.append("id", this.post.id)
+                formData.append("caption", this.post.caption)
+                formData.append("location", this.post.location)
+                formData.append("date", this.post.date)
+                formData.append("photo", this.post.photo, this.post.id + ".png")
 
-                    this.$router.push("/")
+                this.$axios
+                    .post(`${process.env.API}/createPost`, formData)
+                    .then((response) => {
+                        this.$q.localStorage.set("postCreated", true)
 
-                    this.$q.notify({
-                        message: "Postagem Criada.",
-                        color: "primary",
-                        actions: [
-                            {
-                                label: "Ok",
-                                color: "white",
-                            },
-                        ],
-                    })
-
-                    this.$q.loading.hide()
-                })
-                .catch(() => {
-                    if (!navigator.onLine && this.backgroundSyncSupported) {
-                        this.$q.notify("Postagem criada offline")
                         this.$router.push("/")
-                    } else {
-                        this.$q.dialog({
-                            title: "Erro",
-                            message: "Não foi possível criar a postagem.",
-                        })
-                    }
 
-                    this.$q.loading.hide()
-                })
+                        this.$q.notify({
+                            message: "Postagem Criada.",
+                            color: "primary",
+                            actions: [
+                                {
+                                    label: "Ok",
+                                    color: "white",
+                                },
+                            ],
+                        })
+
+                        this.$q.loading.hide()
+                    })
+                    .catch(() => {
+                        if (
+                            !navigator.onLine &&
+                            this.backgroundSyncSupported &&
+                            postCreated
+                        ) {
+                            this.$q.notify("Postagem criada offline")
+                            this.$router.push("/")
+                        } else {
+                            this.addPostError()
+                        }
+
+                        this.$q.loading.hide()
+                    })
+            }
+        },
+        addPostError() {
+            this.$q.dialog({
+                title: "Erro",
+                message: "Não foi possível criar a postagem.",
+            })
         },
     },
     mounted() {

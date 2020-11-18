@@ -111,6 +111,7 @@ self.addEventListener('push', event => {
                     body: data.body,
                     icon: "icons/favicon-128x128.png",
                     badge: "icons/favicon-128x128.png",
+                    image: data.imageUrl,
                     data: {
                         openUrl: data.openUrl
                     }
